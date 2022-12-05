@@ -33,14 +33,9 @@ setEqual(S, T) :- sort(S, Ordenada), sort(T, Ordenada).
 iesimo(1,[X|_],X).
 iesimo(I,[_|Xs],X):- N is I - 1, iesimo(N,Xs,X).
 
-%indexarLista(?Lista, ?Indice, ?Contenido)
-% Funciona como iesimo pero es reversible en todos sus parámetros.
-% Sirve para instanciar listas con un elemento en una dada posición, si I y X se pasan instanciados y L solo parcialmente instanciado o no instanciado.
-indexarLista(L, I, X) :- length(L, Long), between(1, Long, I), iesimo(I,L,X).
-
 %contenido(+?Tablero, ?Fila, ?Columna, ?Contenido)
 % Verdadero si el tablero en la posición (F, C) tiene el contenido Con.
-contenido(T, F, C, Con) :- indexarLista(T, F, Fil), indexarLista(Fil, C, Con).
+contenido(T, F, C, Con) :- nth1(F, T, Fil), nth1(C, Fil, Con).
 
 %disponible(+?Tablero, ?Fila, ?Columna)
 % Verdadero si la posición (F, C) esta libre para ubicar un barco o parte de él, es decir, no esta instanciada ni la posición ni sus adyacentes.
@@ -103,7 +98,7 @@ golpear(T, X, Y, T2) :- matriz(T, N, M), matriz(T2, N, M), golpearAux(T, X, Y, N
 hundioBarco(T, F, C) :- not((adyacenteEnRango(T,F,C,F1,C1), contenido(T, F1, C1, o))).
 
 % Completar instanciación soportada y justificar.
-%atacar(+Tablero, +Fila, +Columna, -Resultado, -NuevoTab)
+% atacar(+Tablero, +Fila, +Columna, -Resultado, -NuevoTab)
 % T2 es el resultado de golpear a T en (F, C), y resultado indica el efecto del ataque:
 % - Si es agua, hay agua en (F, C) en T.
 % - Si es hundido, hay barco en (F, C) en T, y está aislado (es la última parte del barco).
@@ -118,10 +113,8 @@ atacar(T, F, C, tocado, T2) :- contenido(T, F, C, o), golpear(T, F, C, T2), not(
 
 % Fila y columna son reversibles, porque en cada caso de atacar se instancian con contenido.
 
-% Puede pasarse un tablero instanciado, filas y columnas no instanciadas y Resultado instanciado, y instanciará las filas y columnas con las posiciones que, si se atacaran
-% tendrían el resultado instanciado.
-
-% Puede pasarse el tablero inicial y el final instanciados, y se instanciarán la fila y la columna con el resultado.
+% Puede pasarse un tablero instanciado, filas y columnas no instanciadas y Resultado instanciado, e instanciará los indices de las filas y columnas con las posiciones que, si se atacaran
+% tendrían el resultado instanciado. Esto es porque contenido es reversible en los tableros, y el tablero final se usa en ese predicado.
 
 % Son reversibles todos los parámetros excepto el tablero inicial.
 
